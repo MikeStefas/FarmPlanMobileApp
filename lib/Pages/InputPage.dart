@@ -1,5 +1,8 @@
 import 'package:farm_plan_app/components/FarmPlanAppBar.dart';
+import 'package:farm_plan_app/requests/postFarmPlanResult.dart';
 import 'package:flutter/material.dart';
+
+Map<String, dynamic>? result;
 
 class InputPage extends StatefulWidget {
   const InputPage({super.key});
@@ -16,7 +19,6 @@ class _InputPageState extends State<InputPage> {
   String? _selectedLocation;
   String? _selectedCrop;
   String? _selectedSoil;
-  String? _selectedGoal;
 
   // Dropdown options
   final List<String> _locations = [
@@ -87,24 +89,35 @@ class _InputPageState extends State<InputPage> {
     super.dispose();
   }
 
-  void _submitForm() {
+  _submitForm() async {
+    //check if empty
     if (_areaController.text.isEmpty ||
         double.tryParse(_areaController.text) == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Please enter a valid numeric area.")),
       );
-      return;
+    }
+    //get the ai input
+    final input = {
+      "location": _selectedLocation,
+      "area": double.parse(_areaController.text),
+      "crop": _selectedCrop,
+      "soilType": _selectedSoil,
+    };
+
+    //post the ai input
+    result = await postFarmPlanResult(input);
+
+    if (result != null) {
+      // Navigate and send result as arguments
+      Navigator.pushNamed(context, '/resultpage', arguments: result);
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("API Error")));
     }
 
-    print("Location: $_selectedLocation");
-    print("Area: ${_areaController.text} km²");
-    print("Crop: $_selectedCrop");
-    print("Soil Type: $_selectedSoil");
-    print("Goal: $_selectedGoal");
-
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text("Farm info submitted!")));
+    return;
   }
 
   @override
@@ -175,7 +188,9 @@ class _InputPageState extends State<InputPage> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            onPressed: _submitForm,
+            onPressed: () async {
+              await _submitForm();
+            },
             child: const Text("Submit", style: TextStyle(color: Colors.white)),
           ),
         ),

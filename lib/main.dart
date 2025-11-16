@@ -14,6 +14,7 @@ class FarmPlanApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'FarmPlan',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
@@ -22,7 +23,7 @@ class FarmPlanApp extends StatelessWidget {
       routes: {
         '/homepage': (context) => const HomePage(),
         '/inputpage': (context) => const InputPage(),
-        '/resultpage': (context) => const ResultPage(),
+        '/resultpage': (context) => ResultPage(),
       },
     );
   }
